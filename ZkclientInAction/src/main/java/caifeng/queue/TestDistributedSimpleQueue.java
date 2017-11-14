@@ -7,7 +7,6 @@ public class TestDistributedSimpleQueue {
 
 	public static void main(String[] args) {
 		
-		
 		ZkClient zkClient = new ZkClient("192.168.1.105:2181", 5000, 5000, new SerializableSerializer());
 		DistributedSimpleQueue<User> queue = new DistributedSimpleQueue<User>(zkClient,"/Queue");
 		

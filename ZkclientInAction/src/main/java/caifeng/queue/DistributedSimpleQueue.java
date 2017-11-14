@@ -8,6 +8,10 @@ import org.I0Itec.zkclient.ExceptionUtil;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.exception.ZkNoNodeException;
 
+/**
+ * @author Ethan
+ * @desc 简单的分布式队列
+ */
 public class DistributedSimpleQueue<T> {
 	//客户端
 	protected final ZkClient zkClient;
@@ -65,8 +69,8 @@ public class DistributedSimpleQueue<T> {
 					return getNodeNumber(lhs, Node_NAME).compareTo(getNodeNumber(rhs, Node_NAME));
 				}
 			});
+			//不断循环，判断每一个节点的情况
 			for ( String nodeName : list ){
-				
 				String nodeFullPath = root.concat("/").concat(nodeName);	
 				try {
 					T node = (T) zkClient.readData(nodeFullPath);

@@ -10,11 +10,24 @@ import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.exception.ZkNoNodeException;
 
+/**
+ * @author Ethan
+ * @desc zookeeper实现分布式锁的细节
+ * 实现过程：
+ * 1、在lock节点下创建临时顺序节点
+ * 2、获取lock节点的顺序子节点
+ * 3、判断当前节点是不是顺序子节点中最小的节点
+ * 4、如果是，则直接获取锁，不是则订阅次小节点的节点删除事件
+ * 5、次小节点删除后，重新从第2步开始执行
+ */
 public class BaseDistributedLock {
 	
     private final ZkClientExt client;
+    //创建的锁节点的路径
     private final String  path;
+    //lock节点的路径
     private final String  basePath;
+    //锁前缀
     private final String  lockName;
     private static final Integer  MAX_RETRY_COUNT = 10;
     	
@@ -22,13 +35,13 @@ public class BaseDistributedLock {
 
         this.client = client;
         this.basePath = path;
+        //lockName是锁前缀
         this.path = path.concat("/").concat(lockName);		
 		this.lockName = lockName;
 	}
 	
 	/**
 	 * @desc 删除占有锁时的顺序节点的路径
-	 * @param ourPath
 	 */
 	private void deleteOurPath(String ourPath) throws Exception{
 		client.delete(ourPath);
@@ -67,8 +80,9 @@ public class BaseDistributedLock {
                     haveTheLock = true;
                     
                 }else{
-                	
+                	//监听小于自己的次节点
                     String  previousSequencePath = basePath .concat( "/" ) .concat( pathToWatch );
+                    //在latch上面进行等待
                     final CountDownLatch    latch = new CountDownLatch(1);
                     final IZkDataListener previousListener = new IZkDataListener() {
                 		
@@ -167,7 +181,6 @@ public class BaseDistributedLock {
 	
 	/**
 	 * @desc 释放锁
-	 * @param lockPath
 	 */
 	protected void releaseLock(String lockPath) throws Exception{
 		deleteOurPath(lockPath);	
@@ -175,8 +188,6 @@ public class BaseDistributedLock {
 	
 	/**
 	 * @desc 获取锁
-	 * @param time 时间
-	 * @param unit 时间单位
 	 */
 	protected String attemptLock(long time, TimeUnit unit) throws Exception{
 		
@@ -194,7 +205,9 @@ public class BaseDistributedLock {
             isDone = true;
             try
             {
+            	//创建临时顺序子节点
                 ourPath = createLockNode(client, path);
+                //判断自己是否获取锁，没有获得则等待直到获得
                 hasTheLock = waitToLock(startMillis, millisToWait, ourPath);
             }
             catch ( ZkNoNodeException e )
@@ -210,6 +223,7 @@ public class BaseDistributedLock {
                 }
             }
         }
+        //成功获取锁，返回锁路径
         if ( hasTheLock )
         {
             return ourPath;

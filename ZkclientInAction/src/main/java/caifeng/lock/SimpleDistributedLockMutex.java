@@ -15,8 +15,6 @@ public class SimpleDistributedLockMutex extends BaseDistributedLock implements
     
     /**
      * @desc 判断是否正确获取锁
-     * @param time 时间
-     * @param unit 时间单位
      */
     private boolean internalLock(long time, TimeUnit unit) throws Exception
     {

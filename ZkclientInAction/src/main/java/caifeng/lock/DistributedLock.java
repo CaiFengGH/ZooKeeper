@@ -19,5 +19,4 @@ public interface DistributedLock {
 	 */
     public void release() throws Exception;
 
-
 }
