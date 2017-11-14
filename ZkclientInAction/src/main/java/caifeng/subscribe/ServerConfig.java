@@ -1,10 +1,17 @@
 package caifeng.subscribe;
 
+/**
+ * @author Ethan
+ * @desc 服务器配置
+ */
 public class ServerConfig {
-	
+	//数据库地址
 	private String dbUrl;
+	//数据库密码
 	private String dbPwd;
+	//数据库用户
 	private String dbUser;
+	
 	public String getDbUrl() {
 		return dbUrl;
 	}

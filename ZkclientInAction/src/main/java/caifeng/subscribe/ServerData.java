@@ -1,10 +1,15 @@
 package caifeng.subscribe;
 
+/**
+ * @author Ethan
+ * @desc 服务器属性
+ */
 public class ServerData {
 	
-	private String address;
 	private Integer id;
+	private String address;
 	private String name;
+	
 	public String getAddress() {
 		return address;
 	}

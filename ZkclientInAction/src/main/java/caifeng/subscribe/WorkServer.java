@@ -5,6 +5,10 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.exception.ZkNoNodeException;
 import com.alibaba.fastjson.JSON;
 
+/**
+ * @author Ethan
+ * @desc 工作服务器
+ */
 public class WorkServer {
 	//客户端
 	private ZkClient zkClient;
@@ -14,7 +18,7 @@ public class WorkServer {
 	private String serversPath;
 	//服务器的数据
 	private ServerData serverData;
-	//服务器的配置
+	//服务器的初始配置
 	private ServerConfig serverConfig;
 	//时间监听器
 	private IZkDataListener dataListener;
@@ -47,7 +51,7 @@ public class WorkServer {
 	}
 
 	/**
-	 * @desc 初始化配置 
+	 * @desc 开启服务
 	 */
 	public void start() {
 		System.out.println("work server start...");
@@ -55,7 +59,7 @@ public class WorkServer {
 	}
 
 	/**
-	 * @desc 取消时间订阅
+	 * @desc 取消服务
 	 */
 	public void stop() {
 		System.out.println("work server stop...");

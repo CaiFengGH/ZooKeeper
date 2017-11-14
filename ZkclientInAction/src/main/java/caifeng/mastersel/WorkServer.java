@@ -12,6 +12,14 @@ import org.I0Itec.zkclient.exception.ZkNoNodeException;
 import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.apache.zookeeper.CreateMode;
 
+/**
+ * @author Ethan
+ * @desc 工作服务器
+ * master释放的三种情况：
+ * 1、master主动释放
+ * 2、master节点对应的服务器宕机
+ * 3、网络抖动，优化策略是优先选取上次的master节点对应的服务器
+ */
 public class WorkServer {
 	//服务器自身运行状态
 	private volatile boolean running = false;
@@ -19,24 +27,26 @@ public class WorkServer {
 	private ZkClient zkClient;
 	//master节点路径
 	private static final String MASTER_PATH = "/master";
-
+	//数据监听
 	private IZkDataListener dataListener;
 	//服务器自身数据
 	private RunningData serverData;
 	//master数据
 	private RunningData masterData;
 	
+	//创建调度器，进行网络抖动的优化
 	private ScheduledExecutorService delayExector = Executors.newScheduledThreadPool(1);
 	private int delayTime = 5;
 
 	public WorkServer(RunningData rd) {
 		this.serverData = rd;
 		this.dataListener = new IZkDataListener() {
+			
 			//为了避免上一个master不能成为新的master，使用调度器
 			public void handleDataDeleted(String dataPath) throws Exception {
 				// TODO Auto-generated method stub
 				//takeMaster();
-				//避免资源迁移带来的损耗
+				//避免资源迁移带来的损耗，如果是则争抢权力，如果不是则延迟5秒争抢
 				if (masterData!=null && masterData.getName().equals(serverData.getName())){
 					takeMaster();
 				}else{
@@ -47,6 +57,7 @@ public class WorkServer {
 					}, delayTime, TimeUnit.SECONDS);
 				}
 			}
+			
 			public void handleDataChange(String dataPath, Object data)
 					throws Exception {
 				// TODO Auto-generated method stub
@@ -68,14 +79,16 @@ public class WorkServer {
 	}
 
 	/**
-	 * @desc 增强服务
+	 * @desc 开始服务
 	 */
 	public void start() throws Exception {
 		if (running) {
 			throw new Exception("server has startup...");
-		}
+		} 
 		running = true;
+		//订阅master节点的删除事件
 		zkClient.subscribeDataChanges(MASTER_PATH, dataListener);
+		//争抢master权力
 		takeMaster();
 	}
 
@@ -89,9 +102,9 @@ public class WorkServer {
 		running = false;
 		
 		delayExector.shutdown();
-
+		//取消master节点订阅
 		zkClient.unsubscribeDataChanges(MASTER_PATH, dataListener);
-
+		//释放master权力
 		releaseMaster();
 	}
 
@@ -130,7 +143,7 @@ public class WorkServer {
 			// ignore;
 		}
 	}
-
+	
 	/**
 	 * @desc 释放master节点
 	 */
@@ -156,7 +169,7 @@ public class WorkServer {
 		} catch (ZkNoNodeException e) {
 			return false;
 		} catch (ZkInterruptedException e) {
-			//中断则继续进行捕获
+			//中断则继续进行重试
 			return checkMaster();
 		} catch (ZkException e) {
 			return false;

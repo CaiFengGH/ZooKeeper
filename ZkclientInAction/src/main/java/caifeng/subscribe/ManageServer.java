@@ -8,6 +8,14 @@ import org.I0Itec.zkclient.exception.ZkNoNodeException;
 import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import com.alibaba.fastjson.JSON;
 
+/**
+ * @author Ethan
+ * @desc 管理服务器
+ * 具备以下功能：
+ * 1、监控工作服务器的列表变化
+ * 2、监控command节点，执行最新的命令
+ * 3、向config传递新内容
+ */
 public class ManageServer {
 	//服务器注册路径
 	private String serversPath;
@@ -33,6 +41,7 @@ public class ManageServer {
 		this.zkClient = zkClient;
 		this.config = config;
 		this.configPath = configPath;
+		
 		this.childListener = new IZkChildListener() {
 
 			public void handleChildChange(String parentPath,
@@ -95,7 +104,7 @@ public class ManageServer {
 	}
 
 	/**
-	 * @desc 
+	 * @desc 创建操作
 	 */
 	private void execCreate() {
 		if (!zkClient.exists(configPath)) {
