@@ -7,8 +7,13 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.I0Itec.zkclient.serialize.BytesPushThroughSerializer;
 
+/**
+ * @author Ethan
+ * @desc 分布式序列号生成器
+ * UUID:无规律且较长
+ */
 public class IdMaker {
-	
+	//用于操作zookeeper
 	private ZkClient client = null;
 	//服务器地址
 	private final String server;
@@ -18,7 +23,8 @@ public class IdMaker {
 	private final String nodeName;
 	//服务器是否正在运行
 	private volatile boolean running = false;
-	//
+	
+	//删除的线程池
 	private ExecutorService cleanExector = null;
 	//删除方式 不删除 立即删除 延时删除
 	public enum RemoveMethod{
