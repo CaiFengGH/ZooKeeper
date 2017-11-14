@@ -12,6 +12,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+/**
+ * @author Ethan
+ * @desc 基于netty框架实现服务器
+ */
 public class ServerImpl implements Server {
 	
 	private EventLoopGroup bossGroup = new NioEventLoopGroup();

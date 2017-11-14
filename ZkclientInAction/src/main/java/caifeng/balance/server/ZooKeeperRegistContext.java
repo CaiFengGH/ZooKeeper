@@ -2,10 +2,17 @@ package caifeng.balance.server;
 
 import org.I0Itec.zkclient.ZkClient;
 
+/**
+ * @author Ethan
+ * @desc 基于zookeeper的上下文环境
+ */
 public class ZooKeeperRegistContext {
 	
+	//zookeeper的路径
 	private String path;
+	//客户端
 	private ZkClient zkClient;
+	//数据
 	private Object data;
 	
 	public ZooKeeperRegistContext(String path, ZkClient zkClient, Object data) {

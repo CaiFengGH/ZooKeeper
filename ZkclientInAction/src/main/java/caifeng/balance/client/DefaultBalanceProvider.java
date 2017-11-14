@@ -7,6 +7,10 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.serialize.SerializableSerializer;
 import caifeng.balance.server.ServerData;
 
+/**
+ * @author Ethan
+ * @desc 此处的负载均衡算法，只是简单的获得最小的负载因子的实现
+ */
 public class DefaultBalanceProvider extends AbstractBalanceProvider<ServerData> {
 	
 	private final String zkServer;

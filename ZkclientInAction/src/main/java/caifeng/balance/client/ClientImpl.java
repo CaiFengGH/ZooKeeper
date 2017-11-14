@@ -13,6 +13,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+/**
+ * @author Ethan
+ * @desc 客户端实现类
+ */
 public class ClientImpl implements Client {
 		
 	private final BalanceProvider<ServerData> provider;
